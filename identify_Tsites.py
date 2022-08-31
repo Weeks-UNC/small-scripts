@@ -19,7 +19,8 @@ fileName2 = sys.argv[2]
 try:
     newFileName = sys.argv[3]
 except (IndexError):
-    newFileName = fileName.strip((".txt") + "_tsites.txt")
+    print("No new file name detected. Outputting into file Identified_Tsites.txt")
+    newFileName = "Identified_Tsites.txt"
 
 file1 = open(fileName, "r")
 file2 = open(fileName2, "r")
