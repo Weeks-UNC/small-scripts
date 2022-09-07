@@ -17,6 +17,16 @@ fileName = sys.argv[1] #"RCW_TMO_RCW_profile.txt"
 fileName2 = sys.argv[2]
 
 try:
+    min_difference = float(input("Input minimum difference. Enter nothing for default (0.2): "))
+except(SyntaxError):
+    min_difference = 0.2
+    
+try:
+    min_ratio = float(input("Input minimum fold change. Enter nothing for default (3): "))
+except(SyntaxError):
+    min_ratio = 3
+    
+try:
     newFileName = sys.argv[3]
 except (IndexError):
     print("No new file name detected. Outputting into file Identified_Tsites.txt")
@@ -48,7 +58,7 @@ for line1, line2 in zip(file1, file2):
                     difference  = float(tReact) - float(dReact) 
                     dividend = float(tReact)/float(dReact)
                 
-                if (difference >= 0.20 and dividend >= 3): #check if TMO-DMS >= 0.2 and TMO/DMS  >= 3
+                if (difference >= min_difference and dividend >= min_ratio): #check if TMO-DMS >= 0.2 and TMO/DMS  >= 3
                     numSites +=1
                     newFile.write(curLine1[0] + "    " + str(difference) + "    " + str(dividend) + "    " + curLine1[3] + "    " + curLine2[3] + "    " + curLine1[10] + "    " + curLine1[5] + "    " + curLine2[5] + "    " + curLine1[12])
                     newFile.write("\n")
