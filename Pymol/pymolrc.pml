@@ -1,9 +1,7 @@
 # Created by: Seth Veenbaas
-# Weeks Lab UNC Chapel Hill
 # Last date modified: 10/06/22
 
 # Installation instructions at https://github.com/Weeks-UNC/small-scripts/tree/master/Pymol
-
 
 #### Startup settings ####
 # set size of PYMOL window on boot
@@ -71,38 +69,42 @@ alias ribosome, set surface_quality, 0; rna_protein_obj
 # RNA ribbon command
 alias rna_ribbon, set cartoon_ring_finder, 0
 
-# show surface of RNA only
+# Show surface of RNA only
 alias rna_surface, show surface, byres polymer & name O2'
 
-# show surface of RNA and Protein
-alias rna_protein_surface, show surface, byres polymer & name O2'; show surface, byres polymer & name CA; set surface_color, lightpink, byres polymer & name CA
+# Show surface of RNA and Protein
+alias rna_protein_surf, show surface, byres polymer & name O2'; show surface, byres polymer & name CA; set surface_color, lightpink, byres polymer & name CA
 
 # ligand colored by element
 alias ligand, util.cbao (organic)
 
 # shows details of ligand binding site.
-alias binding_site, ligand; select Binding_Site, byresidue polymer within 4.5 of organic; set cartoon_ring_finder, 0; show sticks, Binding_Site; util.cnc Binding_Site; contacts Ligand, Binding_Site; disable contacts_all & contacts_aa & contacts_dd; hide labels, contacts; color purple, contacts_polar; color purple, contacts_polar_ok; color tv_yellow, contacts_all; zoom (Ligand)
+#
+# requires installing a pymol plug-in
+### In Pymol navigate to: Plugin > Plugin Manager > Install New Plugin 
+### paste into URL field: https://raw.githubusercontent.com/dkoes/show_contacts/master/show_contacts.py > click Fetch
+alias binding_site, ligand; select Binding_Site, byresidue polymer within 4.5 of (organic); set cartoon_ring_finder, 0; show sticks, Binding_Site; util.cnc Binding_Site; contacts (organic), Binding_Site; disable contacts_all & contacts_aa & contacts_dd; hide labels, contacts; color deeppurple, contacts_polar; color violet, contacts_polar_ok; color tv_yellow, contacts_all
 
 # Select ligands
 alias select_ligand, select ligand, (organic) and not (byres polymer & name O2')
 
-# remove organic ligands
+# Remove ligands
 alias remove_ligand, remove organic and not (byres polymer & name O2')
 
-# select all amino acids
+# Select all amino acids
 alias select_protein, select protein, (byres polymer & name CA)
 
-# remove all amino acids
+# Remove all amino acids
 alias remove_protein, remove (byres polymer & name CA)
 
-# select all RNAs
+# Selects all RNAs
 alias select_rna, select RNA, (byres polymer & name O2')
 
-# remove all rnas
+# Remove all rnas
 alias remove_rna, remove (byres polymer & name O2')
 
-# sorts pocket predictions based on if they contact RNA-only, protein-only, or RNA-Protein.
+# Sorts pocket predictions based on if they contact RNA-only, protein-only, or RNA-Protein.
 alias sort_pockets, extract Protein_Pockets, byresidue resn STP within 4 of (byres polymer & name CA); extract RNA-Protein_Pockets, byresidue resn STP and Protein_Pockets and within 4 of (byres polymer & name O2'); extract RNA_Pockets, byresidue resn STP and not Protein_Pockets; color purple, Protein_Pockets; color skyblue, RNA-Protein_Pockets color tv_orange, RNA_Pockets
 
-# set a-sphere radius based on data in b factor column. (for use with *real_sphere.pdb files)
+# Sets a-sphere radius based on data in b factor column. (for use with *real_sphere.pdb files)
 alias fpocket_radius, cmd.alter('resn STP', 'vdw = b - 1.65')
