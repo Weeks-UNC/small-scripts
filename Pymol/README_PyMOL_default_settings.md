@@ -157,7 +157,7 @@ alias: name of the PyMOL command for creating a new alias.
     > PyMOL> alias rna_surface, show surface, byres polymer & name O2'
 
 
-|Style: PyMOL Default|Style: rna Alias|Style: rna + rna_surface Alias|
+|Style: PyMOL Default|Style: rna Alias|Style: rna + rna_surface Aliases|
 |:-:|:-:|:-:|
 |![Style: PyMOL Default](https://github.com/Weeks-UNC/small-scripts/blob/master/Pymol/Images/3E5C_RNA_Default_Style.png?raw=true)|![Style: rna Alias](https://github.com/Weeks-UNC/small-scripts/blob/master/Pymol/Images/3E5C_RNA_rna_Style.png?raw=true)|![Style: rna + rna_surface Alias](https://github.com/Weeks-UNC/small-scripts/blob/master/Pymol/Images/3E5C_RNA_rna_s_Style.png?raw=true)
 
