@@ -170,7 +170,7 @@ alias: name of the PyMOL command for creating a new alias.
 
 |Style: PyMOL Default|Style: rna_protein Alias|Style: rna_protein + rna_ribbon Aliases|
 |:-:|:-:|:-:|
-|![Style: PyMOL Default](https://github.com/Weeks-UNC/small-scripts/blob/master/Pymol/Images/5GX2_RNA_default_Style.png?raw=true)|![Style: rna_protein Alias](https://github.com/Weeks-UNC/small-scripts/blob/master/Pymol/Images/5GX2_RNA_rna_protein_Style.png?raw=true)|![Style: rrna_protein + rna_ribbon Aliases](https://github.com/Weeks-UNC/small-scripts/blob/master/Pymol/Images/5GX2_RNA_rna+rna_ribbon_Style.png?raw=true)
+|![Style: PyMOL Default](https://github.com/Weeks-UNC/small-scripts/blob/master/Pymol/Images/5GX2_RNA-Protein_default_Style.png?raw=true)|![Style: rna_protein Alias](https://github.com/Weeks-UNC/small-scripts/blob/master/Pymol/Images/5GX2_RNA_rna_protein_Style.png?raw=true)|![Style: rrna_protein + rna_ribbon Aliases](https://github.com/Weeks-UNC/small-scripts/blob/master/Pymol/Images/5GX2_RNA_rna+rna_ribbon_Style.png?raw=true)
 
 
 ## NOTES
