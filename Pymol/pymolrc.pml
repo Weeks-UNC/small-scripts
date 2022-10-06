@@ -72,10 +72,10 @@ alias ribosome, set surface_quality, 0; rna_protein_obj
 alias rna_ribbon, set cartoon_ring_finder, 0
 
 # show surface of RNA only
-alias rna_surf, show surface, byres polymer & name O2'
+alias rna_surface, show surface, byres polymer & name O2'
 
 # show surface of RNA and Protein
-alias rna_protein_surf, show surface, byres polymer & name O2'; show surface, byres polymer & name CA; set surface_color, lightpink, byres polymer & name CA
+alias rna_protein_surface, show surface, byres polymer & name O2'; show surface, byres polymer & name CA; set surface_color, lightpink, byres polymer & name CA
 
 # ligand colored by element
 alias ligand, util.cbao (organic)
