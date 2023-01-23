@@ -4,7 +4,7 @@
 
 ### This tutorial will cover:
 
-1. How to customize your PyMOL pymolrc file with default settings and/or aliases.
+1. How to edit your PyMOL pymolrc file with default settings and/or custom aliases.
 2. What to include in your PyMOL pymolrc file
 3. How to write an basic PyMOL alias (custom function).
 4. Example pymolrc files
@@ -18,7 +18,7 @@
 
     **If you plan to use the Weeks lab's default pymolrc.pml file:**
     - Copy the contents of the pymolrc.pml file from the Weeks-UNC/small-scripts/Pymol github directory.
-    - Paste the contents of the pymolrc.pml file into your open notepad file and save.
+    - Paste the contents of the pymolrc.pml file into the open notepad file and save.
 
 ## ADVANCED SET-UP: Edit your pymolrc file within the command line
 
