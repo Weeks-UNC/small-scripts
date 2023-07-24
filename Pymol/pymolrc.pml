@@ -79,7 +79,6 @@ alias rna_protein_surf, show surface, byres polymer & name O2'; show surface, by
 alias ligand, util.cbao (organic)
 
 # shows details of ligand binding site.
-#
 # requires installing a pymol plug-in
 ### In Pymol navigate to: Plugin > Plugin Manager > Install New Plugin 
 ### paste into URL field: https://raw.githubusercontent.com/dkoes/show_contacts/master/show_contacts.py > click Fetch
