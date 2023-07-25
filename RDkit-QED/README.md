@@ -6,11 +6,11 @@ Calculate a QED score and properties related to drug-likeness from a .sdf struct
 
 ## Installation
 
-### Install conda enviroment with provided .yml file
+### Option 1: Install conda enviroment with provided .yml file
 
     conda create -f rdkit_enviroment.yml
 
-### Manually install dependancies
+### Option 2: Manually install dependancies
 
 * rdkit
 * openpyxl
