@@ -15,7 +15,7 @@
 
 ![QED html output](QED_scores_out/QED_scores_out.html)
 
-<iframe 
+<iframe> 
   width="660"
   height="375"
   src="QED_scores_out/QED_scores_out.html"
