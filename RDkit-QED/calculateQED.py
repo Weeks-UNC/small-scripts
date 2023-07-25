@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
-# -----------------------------------------------------
+
+# --------------------------------------------------------
 # Calculate QED scores
 # Seth Veenbaas
 # Weeks Lab, UNC-CH
-# 2022
+# 2023
 #
 # Version 0.1.0
 #
-# -----------------------------------------------------
+# Calculates QED properties and QED score from SDF files.
+#
+# --------------------------------------------------------
 
 import argparse
-from glob import glob
 from pathlib import Path
 from rdkit import Chem
 from rdkit.Chem import QED
@@ -18,8 +20,8 @@ from rdkit.Chem import PandasTools
 import pandas as pd
 
 
-def get_QED(directory, file):
-    QED_out = []
+def get_qed(directory, file):
+    qed_out = []
 
     if directory:
         sdf_files = directory.glob('*.sdf')
@@ -35,20 +37,20 @@ def get_QED(directory, file):
             print()
             print(sdf, score)
 
-            QED_out.append((sdf, smi, properties[0], properties[1], properties[2], properties[3], properties[4], properties[5], properties[6], properties[7], score))
+            qed_out.append((sdf, smi, properties[0], properties[1], properties[2], properties[3], properties[4], properties[5], properties[6], properties[7], score))
 
-    QED_df = pd.DataFrame(QED_out, columns=['File name', 'SMILES', 'MW', 'ALOGP', 'HBA', 'HBD', 'PSA', 'ROTB', 'AROM', 'ALERTS', 'QED score'])
-    PandasTools.AddMoleculeColumnToFrame(QED_df, smilesCol='SMILES')
+    qed_df = pd.DataFrame(qed_out, columns=['File name', 'SMILES', 'MW', 'ALOGP', 'HBA', 'HBD', 'PSA', 'ROTB', 'AROM', 'ALERTS', 'QED score'])
+    PandasTools.AddMoleculeColumnToFrame(qed_df, smilesCol='SMILES')
 
-    return QED_df 
+    return qed_df 
 
-def save_QED(QED_df, out):
+def save_qed(qed_df, out):
     if not out.is_dir():
         out.mkdir(parents=True, exist_ok=True)
 
-    QED_df.to_excel(out / 'QED_scores_out.xlsx',
+    qed_df.to_excel(out / 'QED_scores_out.xlsx',
             sheet_name='RDkit')
-    QED_df.to_html(out / 'QED_scores_out.html')
+    qed_df.to_html(out / 'QED_scores_out.html')
 
 
 
@@ -71,8 +73,8 @@ def parseArgs():
 
 def main(directory, file, out):
 
-    QED_df = get_QED(directory, file)
-    save_QED(QED_df, out)
+    qed_df = get_qed(directory, file)
+    save_qed(qed_df, out)
 
 
 if __name__ == "__main__":

@@ -13,14 +13,6 @@
 
 ## Output
 
-![QED html output](QED_scores_out/QED_scores_out.html)
+![QED scores out](QED_scores_out/QED_scores_out.png)
 
-<iframe> 
-  width="660"
-  height="375"
-  src="QED_scores_out/QED_scores_out.html"
-  frameborder="0"
-  allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-  allowfullscreen>
-</iframe>
 
