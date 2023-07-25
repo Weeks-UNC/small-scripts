@@ -18,9 +18,10 @@ Calculate a QED score and properties related to drug-likeness from a .sdf struct
 
 ## Input file format
 
-1. Input must be an SDF file.
-    * Input files (.sdf) can be made in ChemDraw by saving as MDL SDfile V3000 (*.sdf).
-    * All chemical structures in the input SDF files will be analyzed.
+### Input files must be SDF files.
+* Input files (.sdf) can be made in ChemDraw by saving as MDL SDfile V3000 (*.sdf).
+* ChemDraw files with multiple structures can be saved to a single SDF file.
+* All chemical structures in the input SDF files will be analyzed.
 
 ## Arguments
 
