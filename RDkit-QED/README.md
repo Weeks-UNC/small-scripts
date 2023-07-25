@@ -42,11 +42,11 @@ Calculate a QED score and properties related to drug-likeness from a .sdf struct
 
 ### Calculate QED score for all files in a directory
 
-    python calculateQED.py --directory path_to_directory
+    python calculateQED.py --directory data
 
 ### Calculate QED score for all structures in a single file
 
-    python calculateQED.py --file path_to_file
+    python calculateQED.py --file data/exmaple.sdf
 
 ## Output files
 
