@@ -14,9 +14,10 @@ Calculate a QED score and properties related to drug-likeness from a .sdf struct
 
 ### Option 2: Manually install dependancies
 
-* rdkit
-* openpyxl
-* pandas
+  * rdkit
+  * xlsxwriter
+  * pandas=2.1
+  * pyarrow
 
 ## Input file formats
 
@@ -45,7 +46,6 @@ Calculate a QED score and properties related to drug-likeness from a .sdf struct
     -o (--out'): Path to output directory. (Default=directory of input file)
     -p (--properties): Adds QED properties to outputs (e.g. 'MW', 'ALOGP', 'HBA', 'HBD', 'PSA', 'ROTB', 'AROM', 'ALERTS'). (Default=False)
     -md (--moldescriptors): Adds QED properties to outputs (e.g. 'Num Ring', 'Frac Sp3', 'MR', 'Geometry'). (Default=False)
-    -i (--iupac): Fetch iupac name from CACTUS using SMILES structure. IUPAC names are usually too long to be helpful. (Default=False)
 
 ## Usage examples
 
@@ -53,9 +53,11 @@ Calculate a QED score and properties related to drug-likeness from a .sdf struct
 
     activate rdkit
 
-### Calculate QED score from a .csv file
+### Calculate QED score and QED properties from a .csv file
 
-    python calculateQED.py --csv example_inputs/test_smiles.csv --out example_outputs
+    python calculateQED.py --csv example_inputs/test_smiles.csv --out example_outputs -p
+
+![QED scores out](images/test_qed_output.png)
 
 ### Calculate SMILES, QED score, QED properties, and moldescriptors from a .sdf file
 
@@ -87,8 +89,5 @@ Calculate a QED score and properties related to drug-likeness from a .sdf struct
     * QED properties (optional)
     * Molecular properties (optional)
   
-### Example output: 
-
-![QED scores out](images/test_qed_output.png)
 
 

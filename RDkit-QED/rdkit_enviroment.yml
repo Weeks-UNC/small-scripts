@@ -4,5 +4,8 @@ channels:
   - defaults
 dependencies:
   - rdkit
-  - openpyxl
-prefix: /home/sethv/anaconda3/envs/rdkit
+  - xlsxwriter
+  - ipykernel
+  - pandas=2.1
+  - pyarrow
+prefix: /home/sdvee/anaconda3/envs/rdkit

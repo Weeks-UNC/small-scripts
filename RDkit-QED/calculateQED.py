@@ -15,26 +15,14 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, QED, PandasTools, rdMolDescriptors, Crippen
 import argparse
 from pathlib import Path
-import requests
 
 ### PandasTools settings
 PandasTools.InstallPandasTools()
 PandasTools.RenderImagesInAllDataFrames(images=True)
 
-
-def smiles_to_iupac(smiles):
-    CACTUS = "https://cactus.nci.nih.gov/chemical/structure/{0}/{1}"
-    rep = "iupac_name"
-    url = CACTUS.format(smiles, rep)
-    response = requests.get(url)
-    response.raise_for_status()
-    print(response.elapsed) 
-    return response.text
-
-
-def get_QED_smiles(file, out, properties, moldescriptor, iupac):
+def make_from_smiles(csv, out, properties, moldescriptor):
         
-    smiles_df = pd.read_csv(file)
+    smiles_df = pd.read_csv(csv)
     smiles_col = [col for col in smiles_df.columns if 'SMILES' in col][0]
     smiles_df[smiles_col] = smiles_df[smiles_col].astype(str)
 
@@ -43,21 +31,10 @@ def get_QED_smiles(file, out, properties, moldescriptor, iupac):
     
     smiles_df['ROMol'].apply(lambda x: AllChem.EmbedMolecule(AllChem.AddHs(x)))
     
-    smiles_df['QED'] = smiles_df['ROMol'].apply(lambda x: QED.default(x))
-    if properties:
-            get_qed_properties(smiles_df, molcol='ROMol')
-    if moldescriptor:
-            get_mol_decriptors(smiles_df, molcol='ROMol')
-    if iupac:
-            try:
-                smiles_df['Name'] = smiles_df['SMILES'].apply( lambda x: smiles_to_iupac(x))
-            except:
-                pass
-    
-    save_df(df=smiles_df, out=out, file=file)
+    add_qed(smiles_df, csv, out, properties, moldescriptor)
     
 
-def get_QED_sdf(sdf, out, properties, moldescriptor, iupac):
+def make_from_sdf(sdf, out, properties, moldescriptor):
 
     name = Path(sdf).stem 
     string_sdf = str(sdf)
@@ -66,19 +43,45 @@ def get_QED_sdf(sdf, out, properties, moldescriptor, iupac):
     
     sdf_df['ROMol'].apply(lambda x: AllChem.EmbedMolecule(AllChem.AddHs(x)))
     
-    sdf_df['QED'] = sdf_df['ROMol'].apply(lambda x: QED.default(x))
-    if properties:
-            get_qed_properties(sdf_df, molcol='ROMol')
-    if moldescriptor:
-            get_mol_decriptors(sdf_df, molcol='ROMol')
-    if iupac:
-            try:
-                sdf_df['Name'] = sdf_df['SMILES'].apply( lambda x: smiles_to_iupac(x))
-            except:
-                pass
+    add_qed(sdf_df, sdf, out, properties, moldescriptor)
 
-    # PandasTools.AddMoleculeColumnToFrame(sdf_df, smilesCol='SMILES', molCol='ROMol')
-    save_df(df=sdf_df, out=out, file=sdf)
+
+def add_qed(df, file, out, properties, moldescriptor):
+    df['QED'] = df['ROMol'].apply(lambda x: QED.default(x))
+    if properties:
+            df = get_qed_properties(df, molcol='ROMol')
+    if moldescriptor:
+            df = get_mol_decriptors(df, molcol='ROMol')
+
+
+    # PandasTools.AddMoleculeColumnToFrame(df, smilesCol='SMILES', molCol='ROMol')
+    save_df(df=df, out=out, file=file)
+
+
+def save_df(df, out, file):
+    if out:
+        dir = Path(out)
+    else:    
+        dir = Path(file).parent
+    if not dir.is_dir():
+        dir.mkdir()
+    file_name = Path(file).stem
+    sdf_out = str(Path(dir, file_name + "_qed.sdf"))
+    
+    print(f'Saving {sdf_out} ....')
+    PandasTools.WriteSDF(df, sdf_out, molColName='ROMol', properties=list(df.columns))
+
+    print(f'Saving {Path(dir, file_name + "_qed.xlsx")} ....')
+    PandasTools.SaveXlsxFromFrame(df, Path(dir, file_name + '_qed.xlsx'), molCol='ROMol', size=(150, 150))
+
+    try:         
+        df.to_html(Path(dir, file_name + "_qed.html"))
+        print(f'Saving {Path(dir, file_name + "_qed.html")} ....')  
+    except:
+        print("Unable to save .HTML file.")
+
+    
+    print('Done!')
 
 
 def get_qed_properties(df, molcol='ROMol'):
@@ -119,30 +122,6 @@ def get_mol_decriptors(df, molcol='ROMol'):
 
     return df
 
-
-def save_df(df, out, file):
-    if out:
-        dir = Path(out)
-    else:    
-        dir = Path(file).parent
-    file_name = Path(file).stem
-    sdf_out = str(Path(dir, file_name + "_qed.sdf"))
-    
-    print(f'Saving {sdf_out} ....')
-    PandasTools.WriteSDF(df, sdf_out, molColName='ROMol', properties=list(df.columns))
-
-    print(f'Saving {Path(dir, file_name + "_qed.xlsx")} ....')
-    PandasTools.SaveXlsxFromFrame(df, Path(dir, file_name + '_qed.xlsx'), molCol='ROMol', size=(150, 150))
-           
-         
-    print(f'Saving {Path(dir, file_name + "_qed.html")} ....')    
-    df.to_html(Path(dir, file_name + '_qed.html'))
-    
-    print('Done!')
-
-
-
-
 def parseArgs():
     prs = argparse.ArgumentParser()
     ex_group = prs.add_mutually_exclusive_group()
@@ -166,24 +145,21 @@ def parseArgs():
     
     prs.add_argument('-md', '--moldescriptors', action='store_true', default = False,
                      help='Adds QED properties to outputs. (Default=False)')
-    
-    prs.add_argument('-i', '--iupac', action='store_true', default = False,
-                     help='Fetch iupac name from CACTUS using SMILES structure. (Default=False)')
 
     args = prs.parse_args()
     return args
 
 
-def main(dir, csv, sdf, out, properties, moldescriptors, iupac):
+def main(dir, csv, sdf, out, properties, moldescriptors):
     print('Calculating properties...')
     if csv:
-        get_QED_smiles(csv, out, properties, moldescriptors, iupac)
+        make_from_smiles(csv, out, properties, moldescriptors)
     elif sdf:
-        get_QED_sdf(sdf, out, properties, moldescriptors, iupac)
+        make_from_sdf(sdf, out, properties, moldescriptors)
     elif dir:
         sdf_files = glob(f"{dir}/*.sdf")
         for sdf in sdf_files:
-            get_QED_sdf(sdf, out, properties, moldescriptors, iupac)
+            make_from_sdf(sdf, out, properties, moldescriptors)
     print('... Done!')
 
 if __name__ == "__main__":
