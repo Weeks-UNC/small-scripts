@@ -61,10 +61,6 @@ Calculate a QED score and properties related to drug-likeness from a .sdf struct
 
     python calculateQED.py --sdf example_inputs/test_library.sdf --out example_outputs -p -md
 
-#### Example output: 
-
-![QED scores out](images/test_qed_output.png)
-
 ## Output files
 
 1. .XLSX file (Excel)
@@ -90,5 +86,9 @@ Calculate a QED score and properties related to drug-likeness from a .sdf struct
     * QED score
     * QED properties (optional)
     * Molecular properties (optional)
+  
+### Example output: 
+
+![QED scores out](images/test_qed_output.png)
 
 
