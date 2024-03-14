@@ -16,9 +16,9 @@
 1. Open a window of PyMOL and choose, **File > Edit pymolrc**
 2. Add your desired commands and aliases and save.  
 
-    **If you plan to use the Weeks lab's default [pymolrc.pml]('pymolrc.pml') file:**
-    - Copy the contents of the [pymolrc.pml]('pymolrc.pml') file from the Weeks-UNC/small-scripts/Pymol github directory.
-    - Paste the contents of the [pymolrc.pml]('pymolrc.pml') file into the open notepad file and save.
+    **If you plan to use the Weeks lab's default [pymolrc.pml](pymolrc.pml) file:**
+    - Copy the contents of the [pymolrc.pml](pymolrc.pml) file from the Weeks-UNC/small-scripts/Pymol github directory.
+    - Paste the contents of the [pymolrc.pml](pymolrc.pml) file into the open notepad file and save.
 
 ## ADVANCED SET-UP: Edit your pymolrc file within the command line
 
