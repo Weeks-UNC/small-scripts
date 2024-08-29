@@ -45,7 +45,8 @@ Calculate a QED score and properties related to drug-likeness from a .sdf struct
 
     -o (--out'): Path to output directory. (Default=directory of input file)
     -p (--properties): Adds QED properties to outputs (e.g. 'MW', 'ALOGP', 'HBA', 'HBD', 'PSA', 'ROTB', 'AROM', 'ALERTS'). (Default=False)
-    -md (--moldescriptors): Adds QED properties to outputs (e.g. 'Num Ring', 'Frac Sp3', 'MR', 'Geometry'). (Default=False)
+    -md (--moldescriptors): Adds QED properties to outputs (e.g. 'Num Ring', 'Frac Sp3', 'MR'). (Default=False)
+    -g (--geometry): Adds molecule geometry to outputs (e.g. 'NPR1', 'NPR2', 'Geometry') (Default=False)
 
 ## Usage examples
 
@@ -72,6 +73,7 @@ Calculate a QED score and properties related to drug-likeness from a .sdf struct
     * QED score
     * QED properties (optional)
     * Molecular properties (optional)
+    * Geometric properties (optional)
 
 2. .HTML file
     * ID
@@ -80,6 +82,7 @@ Calculate a QED score and properties related to drug-likeness from a .sdf struct
     * QED score
     * QED properties (optional)
     * Molecular properties (optional)
+    * Geometric properties (optional)
   
 3. .SDF file
     * Molecular structure coordinates
@@ -88,6 +91,7 @@ Calculate a QED score and properties related to drug-likeness from a .sdf struct
     * QED score
     * QED properties (optional)
     * Molecular properties (optional)
+    * Geometric properties (optional)
   
 
 
