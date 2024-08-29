@@ -5,7 +5,7 @@
 # Weeks Lab, UNC-CH
 # 2024
 #
-# Version 1.0.0
+# Version 1.1.0
 #
 # -----------------------------------------------------
 
@@ -20,7 +20,13 @@ from pathlib import Path
 PandasTools.InstallPandasTools()
 PandasTools.RenderImagesInAllDataFrames(images=True)
 
-def make_from_smiles(csv, out, properties, moldescriptor):
+def make_from_smiles(
+    csv : str | Path,
+    out : str | Path,
+    properties : bool,
+    moldescriptor : bool,
+    geometry : bool,
+):
         
     smiles_df = pd.read_csv(csv)
     smiles_col = [col for col in smiles_df.columns if 'SMILES' in col][0]
@@ -28,37 +34,67 @@ def make_from_smiles(csv, out, properties, moldescriptor):
 
     PandasTools.AddMoleculeColumnToFrame(smiles_df, smilesCol=smiles_col, molCol='ROMol', includeFingerprints=True)
     smiles_df = smiles_df[smiles_df['ROMol'].apply(lambda x: x.HasSubstructMatch(Chem.MolFromSmiles('C')))]    
-    
-    smiles_df['ROMol'].apply(lambda x: AllChem.EmbedMolecule(AllChem.AddHs(x)))
-    
-    add_qed(smiles_df, csv, out, properties, moldescriptor)
+
+    smiles_df['3DMol'] = smiles_df['ROMol'].apply(generate_conformer_and_optimize)
+
+    add_qed(smiles_df, out, csv, properties, moldescriptor, geometry)
     
 
-def make_from_sdf(sdf, out, properties, moldescriptor):
+def make_from_sdf(
+    sdf : str | Path,
+    out : str | Path,
+    properties : bool,
+    moldescriptor : bool,
+    geometry : bool,
+):
 
     name = Path(sdf).stem 
     string_sdf = str(sdf)
     
     sdf_df = PandasTools.LoadSDF(string_sdf, idName='ID', molColName='ROMol', includeFingerprints=False, isomericSmiles=True, smilesName='SMILES', embedProps=True, removeHs=False, strictParsing=True)
     
-    sdf_df['ROMol'].apply(lambda x: AllChem.EmbedMolecule(AllChem.AddHs(x)))
+    sdf_df['3DMol'] = sdf_df['ROMol'].apply(generate_conformer_and_optimize)
     
-    add_qed(sdf_df, sdf, out, properties, moldescriptor)
+    add_qed(sdf_df, out, sdf, properties, moldescriptor, geometry)
 
 
-def add_qed(df, file, out, properties, moldescriptor):
+def generate_conformer_and_optimize(mol : Chem.rdchem.Mol):
+    mol = Chem.AddHs(mol)  # Add hydrogens
+    status = AllChem.EmbedMolecule(mol)  # Generate a conformer
+    if status != 0:  # Embedding failed
+        print(f"Failed to embed molecule: {Chem.MolToSmiles(mol)}")
+        return None
+    AllChem.UFFOptimizeMolecule(mol)  # Optimize the conformer geometry
+    return mol
+
+
+def add_qed(
+    df : pd.DataFrame,
+    out : str | Path,
+    file : str | Path,
+    properties : bool,
+    moldescriptor : bool,
+    geometry : bool,
+):
+
     df['QED'] = df['ROMol'].apply(lambda x: QED.default(x))
     if properties:
             df = get_qed_properties(df, molcol='ROMol')
     if moldescriptor:
             df = get_mol_decriptors(df, molcol='ROMol')
+    if geometry:
+            df = get_geometry(df, molcol='3DMol')
 
 
-    # PandasTools.AddMoleculeColumnToFrame(df, smilesCol='SMILES', molCol='ROMol')
-    save_df(df=df, out=out, file=file)
+    save_df(df=df, out=out, file=file, molcol=['ROMol', '3DMol'])
 
 
-def save_df(df, out, file):
+def save_df(
+    df : pd.DataFrame,
+    out : str | Path,
+    file : str | Path,
+    molcol : str | list,
+):
     if out:
         dir = Path(out)
     else:    
@@ -69,10 +105,10 @@ def save_df(df, out, file):
     sdf_out = str(Path(dir, file_name + "_qed.sdf"))
     
     print(f'Saving {sdf_out} ....')
-    PandasTools.WriteSDF(df, sdf_out, molColName='ROMol', properties=list(df.columns))
+    PandasTools.WriteSDF(df, sdf_out, molColName=molcol[-1], properties=list(df.columns))
 
     print(f'Saving {Path(dir, file_name + "_qed.xlsx")} ....')
-    PandasTools.SaveXlsxFromFrame(df, Path(dir, file_name + '_qed.xlsx'), molCol='ROMol', size=(150, 150))
+    PandasTools.SaveXlsxFromFrame(df, Path(dir, file_name + '_qed.xlsx'), molCol=molcol, size=(150, 150))
 
     try:         
         df.to_html(Path(dir, file_name + "_qed.html"))
@@ -84,7 +120,7 @@ def save_df(df, out, file):
     print('Done!')
 
 
-def get_qed_properties(df, molcol='ROMol'):
+def get_qed_properties(df : pd.DataFrame, molcol : str):
     try:
         df['MW'] = df[molcol].apply(lambda x: QED.properties(x)[0])
         df['ALOGP'] = df[molcol].apply(lambda x: QED.properties(x)[1])
@@ -99,8 +135,9 @@ def get_qed_properties(df, molcol='ROMol'):
 
     return df
 
-def get_mol_decriptors(df, molcol='ROMol'):
-    try:   
+def get_mol_decriptors(df : pd.DataFrame, molcol : str):
+
+    try:
         df['Num Ring'] = df[molcol].apply(lambda x: rdMolDescriptors.CalcNumRings(x))
         df['Num Ar Ring'] = df[molcol].apply(lambda x: rdMolDescriptors.CalcNumAromaticRings(x))
         df['Num ArHetcy'] = df[molcol].apply(lambda x: rdMolDescriptors.CalcNumAromaticHeterocycles(x))
@@ -109,6 +146,15 @@ def get_mol_decriptors(df, molcol='ROMol'):
         df['Num Spiro'] = df[molcol].apply(lambda x: rdMolDescriptors.CalcNumSpiroAtoms(x))
         df['Frac Sp3'] = df[molcol].apply(lambda x: rdMolDescriptors.CalcFractionCSP3(x))
         df['MR'] = df[molcol].apply(lambda x: Crippen.MolMR(x))
+    except:
+        pass
+
+    return df
+
+
+def get_geometry(df : pd.DataFrame, molcol : str):
+    try:
+        # Calculate normalized principle ratios
         df['NPR1'] = df[molcol].apply(lambda x: rdMolDescriptors.CalcNPR1(x))
         df['NPR2'] = df[molcol].apply(lambda x: rdMolDescriptors.CalcNPR2(x))
         
@@ -146,21 +192,31 @@ def parseArgs():
     prs.add_argument('-md', '--moldescriptors', action='store_true', default = False,
                      help='Adds QED properties to outputs. (Default=False)')
 
+    prs.add_argument('-g', '--geometry', action='store_true', default = False,
+                     help='Adds NPR1, NPR2, and geometry descriptor to outputs. (Default=False)')
+
     args = prs.parse_args()
     return args
 
 
-def main(dir, csv, sdf, out, properties, moldescriptors):
+def main(
+    dir : str | Path,
+    csv : str | Path,
+    sdf : str | Path,
+    out : str | Path,
+    properties : bool,
+    moldescriptors : bool,
+    geometry : bool,
+):
     print('Calculating properties...')
     if csv:
-        make_from_smiles(csv, out, properties, moldescriptors)
+        make_from_smiles(csv, out, properties, moldescriptors, geometry)
     elif sdf:
-        make_from_sdf(sdf, out, properties, moldescriptors)
+        make_from_sdf(sdf, out, properties, moldescriptors, geometry)
     elif dir:
         sdf_files = glob(f"{dir}/*.sdf")
         for sdf in sdf_files:
-            make_from_sdf(sdf, out, properties, moldescriptors)
-    print('... Done!')
+            make_from_sdf(sdf, out, properties, moldescriptors, geometry)
 
 if __name__ == "__main__":
     main(**vars(parseArgs()))
