@@ -8,4 +8,5 @@ dependencies:
   - ipykernel
   - pandas=2.1
   - pyarrow
+  - openpyxl
 prefix: /home/sdvee/anaconda3/envs/rdkit

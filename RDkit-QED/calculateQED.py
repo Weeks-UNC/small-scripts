@@ -23,17 +23,27 @@ PandasTools.RenderImagesInAllDataFrames(images=True)
 def make_from_smiles(
     csv : str | Path,
     out : str | Path,
+    column : str,
     properties : bool,
     moldescriptor : bool,
     geometry : bool,
 ):
         
-    smiles_df = pd.read_csv(csv)
-    smiles_col = [col for col in smiles_df.columns if 'SMILES' in col][0]
+    smiles_df = make_dataframe(csv)
+    try:
+        smiles_col = [col for col in smiles_df.columns if column.lower() in col.lower()][0]
+    except IndexError:
+        print(
+            f'Index Error: the input file ({csv}) does not contain a column title containing "{column}"'
+        )
+        exit()
     smiles_df[smiles_col] = smiles_df[smiles_col].astype(str)
 
     PandasTools.AddMoleculeColumnToFrame(smiles_df, smilesCol=smiles_col, molCol='ROMol', includeFingerprints=True)
-    smiles_df = smiles_df[smiles_df['ROMol'].apply(lambda x: x.HasSubstructMatch(Chem.MolFromSmiles('C')))]    
+    
+    # filters dataframe for organic molecules
+    smiles_df = smiles_df.dropna(subset=['ROMol'])
+    smiles_df = smiles_df[smiles_df['ROMol'].apply(lambda x: x.HasSubstructMatch(Chem.MolFromSmiles('C')))]
 
     smiles_df['3DMol'] = smiles_df['ROMol'].apply(generate_conformer_and_optimize)
 
@@ -57,6 +67,25 @@ def make_from_sdf(
     
     add_qed(sdf_df, out, sdf, properties, moldescriptor, geometry)
 
+def make_dataframe(file : Path):
+  """Reads a file (CSV or XLSX) into a Pandas DataFrame.
+
+  Args:
+    file: The path to the file (.csv or .xlsx) to read.
+
+  Returns:
+    A Pandas DataFrame containing the data from the file.
+  """
+  extension = file.suffix.lower()
+
+  if extension == '.csv':
+    df = pd.read_csv(file)
+  elif extension == '.xlsx':
+    df = pd.read_excel(file)
+  else:
+    raise ValueError(f'Unsupported file format: {file}')
+
+  return df
 
 def generate_conformer_and_optimize(mol : Chem.rdchem.Mol):
     mol = Chem.AddHs(mol)  # Add hydrogens
@@ -103,6 +132,9 @@ def save_df(
         dir.mkdir()
     file_name = Path(file).stem
     sdf_out = str(Path(dir, file_name + "_qed.sdf"))
+    
+    # Replace NaN with empty string
+    df = df.fillna('')
     
     print(f'Saving {sdf_out} ....')
     PandasTools.WriteSDF(df, sdf_out, molColName=molcol[-1], properties=list(df.columns))
@@ -186,6 +218,9 @@ def parseArgs():
     prs.add_argument('-o', '--out', type=Path, default = None,
                      help='Path to output directory. (Default=directory of input file)')
     
+    prs.add_argument('-c', '--column', type=str, default = 'SMILES',
+                    help='Column title containing SMILES strings. (Default=SMILE)')
+    
     prs.add_argument('-p', '--properties', action='store_true', default = False,
                      help='Adds QED properties to outputs. (Default=False)')
     
@@ -204,13 +239,14 @@ def main(
     csv : str | Path,
     sdf : str | Path,
     out : str | Path,
+    column: str,
     properties : bool,
     moldescriptors : bool,
     geometry : bool,
 ):
     print('Calculating properties...')
     if csv:
-        make_from_smiles(csv, out, properties, moldescriptors, geometry)
+        make_from_smiles(csv, out, column, properties, moldescriptors, geometry)
     elif sdf:
         make_from_sdf(sdf, out, properties, moldescriptors, geometry)
     elif dir:
