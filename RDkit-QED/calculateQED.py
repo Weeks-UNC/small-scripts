@@ -458,8 +458,8 @@ def parseArgs():
         "-cf",
         "--conformers",
         type=int,
-        default=100,
-        help="Number of conformers to generate. (Default=100)",
+        default=1000,
+        help="Number of conformers to generate. (Default=1000)",
     )
 
     prs.add_argument(
